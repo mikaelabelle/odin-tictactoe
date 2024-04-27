@@ -21,8 +21,5 @@ h1 {
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-.board div p {
-    font-size: 4rem;
+    font-size: 5rem;
 }

@@ -1,4 +1,7 @@
 const boardDiv = document.querySelector(".board")
+let cells
+let selRow
+let selCol
 
 const gameBoard = (function () {
     const board = []
@@ -15,17 +18,18 @@ const gameBoard = (function () {
                 gameScreen.createBoard(i + 1, j + 1)
             }
         }
-    }
 
+    }
     return { printBoard, board }
 })()
 
 function screenController() {
     const createBoard = (row, col) => {
         const cell = document.createElement("div")
-        cell.innerHTML = "<p>X</p>"
+        cell.innerText = ""
         cell.setAttribute("row", row)
         cell.setAttribute("col", col)
+        cell.classList.add("cell")
         boardDiv.appendChild(cell)
     }
 
@@ -105,6 +109,19 @@ function gameLogic(testB) {
 const game = gameController()
 const gameScreen = screenController()
 game.newGame()
+
+cells = document.querySelectorAll(".cell")
+cells.forEach(cell => {
+    cell.addEventListener("click", e => {
+        setGuess(cell)
+    })
+});
+
+const setGuess = (guess) => {
+    selRow = guess.getAttribute("row")
+    selCol = guess.getAttribute("col")
+    console.log(selRow, selCol)
+}
 
 // straight row 1
 // game.playerTurn(1, 1)
