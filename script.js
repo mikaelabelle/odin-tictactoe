@@ -1,20 +1,36 @@
+const boardDiv = document.querySelector(".board")
+
 const gameBoard = (function () {
-    const rowsAndCols = 3
     const board = []
-    for (let i = 0; i < rowsAndCols; i++) {
+    for (let i = 0; i < 3; i++) {
         board[i] = []
-        for (let j = 0; j < rowsAndCols; j++) {
+        for (let j = 0; j < 3; j++) {
             board[i][j] = "[ ]"
         }
     }
 
     const printBoard = () => {
-        board.forEach(row => console.log(...row))
-        console.log("===========")
+        for (let i = 0; i < 3; i++) {
+            for (let j = 0; j < 3; j++) {
+                gameScreen.createBoard(i + 1, j + 1)
+            }
+        }
     }
 
     return { printBoard, board }
 })()
+
+function screenController() {
+    const createBoard = (row, col) => {
+        const cell = document.createElement("div")
+        cell.innerHTML = "<p>X</p>"
+        cell.setAttribute("row", row)
+        cell.setAttribute("col", col)
+        boardDiv.appendChild(cell)
+    }
+
+    return { createBoard }
+}
 
 function gameController() {
     const createPlayer = (playerNum, token) => {
@@ -87,6 +103,7 @@ function gameLogic(testB) {
 }
 
 const game = gameController()
+const gameScreen = screenController()
 game.newGame()
 
 // straight row 1
