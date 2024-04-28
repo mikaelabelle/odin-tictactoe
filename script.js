@@ -1,4 +1,5 @@
 const boardDiv = document.querySelector(".board")
+const playerH2 = document.querySelector("#turn span")
 let cells
 
 const gameBoard = (function () {
@@ -23,6 +24,7 @@ function screenController() {
                 cell.innerText = ""
                 cell.setAttribute("row", i + 1)
                 cell.setAttribute("col", j + 1)
+                cell.setAttribute("player", "none")
                 cell.classList.add("cell")
                 boardDiv.appendChild(cell)
             }
@@ -32,16 +34,31 @@ function screenController() {
 
     const addListener = () => {
         cells.forEach(cell => {
-            cell.addEventListener("click", e => {
-                playerGuess(cell)
-            })
+            cell.addEventListener("click", cellClick)
         });
+    }
+
+    function cellClick(e) {
+        playerGuess(this)
+    }
+
+    const removeListener = () => {
+        cells.forEach(cell => {
+            cell.removeEventListener("click", cellClick)
+        })
     }
 
     const playerGuess = (cell) => {
         let guess = setGuess(cell)
         let turn = game.playerTurn(guess.selRow, guess.selCol)
         cell.innerText = turn.token
+        if (turn.token === "X") {
+            cell.setAttribute("player", "P1")
+        }
+        else {
+            cell.setAttribute("player", "P2")
+        }
+        cell.removeEventListener("click", cellClick)
         game.changeTurn()
     }
 
@@ -51,7 +68,7 @@ function screenController() {
         return { selRow, selCol }
     }
 
-    return { printBoard, addListener, setGuess }
+    return { printBoard, addListener, removeListener, setGuess }
 }
 
 function gameController() {
@@ -70,18 +87,14 @@ function gameController() {
     let currentTurn = playersList[0]
     let winner = null
 
-    const printTurn = () => {
-        console.log(`${currentTurn.name}'s turn`)
-    }
-
     const newGame = () => {
         gameScreen.printBoard()
         gameScreen.addListener()
-        printTurn()
     }
 
     const changeTurn = () => {
         currentTurn == playersList[0] ? currentTurn = playersList[1] : currentTurn = currentTurn = playersList[0]
+        playerH2.innerText = currentTurn.name
     }
 
     const playerTurn = (row, col) => {
@@ -91,9 +104,7 @@ function gameController() {
             gameScreen.printBoard()
             if (gameLogic(gameBoard.board) == "win") {
                 console.log(`${currentTurn.name} won the game!`)
-            }
-            else {
-                printTurn()
+                gameScreen.removeListener()
             }
         }
         else {

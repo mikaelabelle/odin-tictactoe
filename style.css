@@ -4,7 +4,8 @@ body {
     justify-content: center;
 }
 
-h1 {
+h1,
+h2 {
     text-align: center;
 }
 
@@ -23,3 +24,21 @@ h1 {
     justify-content: center;
     font-size: 5rem;
 }
+
+.cell[player="none"]:hover {
+    background-color: #D5F5E3;
+    cursor: pointer;
+}
+
+.cell[player="P1"] {
+    color: #3498DB
+}
+
+.cell[player="P2"] {
+    color: #E67E22
+}
+
+/* .cell[player="P1"]:hover,
+.cell[player="P2"]:hover {
+    background-color: #FADBD8;
+} */
