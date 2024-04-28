@@ -1,7 +1,5 @@
 const boardDiv = document.querySelector(".board")
 let cells
-let selRow
-let selCol
 
 const gameBoard = (function () {
     const board = []
@@ -11,29 +9,49 @@ const gameBoard = (function () {
             board[i][j] = "[ ]"
         }
     }
+    return { board }
+})()
+
+function screenController() {
+    let selRow
+    let selCol
 
     const printBoard = () => {
         for (let i = 0; i < 3; i++) {
             for (let j = 0; j < 3; j++) {
-                gameScreen.createBoard(i + 1, j + 1)
+                const cell = document.createElement("div")
+                cell.innerText = ""
+                cell.setAttribute("row", i + 1)
+                cell.setAttribute("col", j + 1)
+                cell.classList.add("cell")
+                boardDiv.appendChild(cell)
             }
         }
-
-    }
-    return { printBoard, board }
-})()
-
-function screenController() {
-    const createBoard = (row, col) => {
-        const cell = document.createElement("div")
-        cell.innerText = ""
-        cell.setAttribute("row", row)
-        cell.setAttribute("col", col)
-        cell.classList.add("cell")
-        boardDiv.appendChild(cell)
+        cells = document.querySelectorAll(".cell")
     }
 
-    return { createBoard }
+    const addListener = () => {
+        cells.forEach(cell => {
+            cell.addEventListener("click", e => {
+                playerGuess(cell)
+            })
+        });
+    }
+
+    const playerGuess = (cell) => {
+        let guess = setGuess(cell)
+        let turn = game.playerTurn(guess.selRow, guess.selCol)
+        cell.innerText = turn.token
+        game.changeTurn()
+    }
+
+    const setGuess = (guess) => {
+        selRow = guess.getAttribute("row")
+        selCol = guess.getAttribute("col")
+        return { selRow, selCol }
+    }
+
+    return { printBoard, addListener, setGuess }
 }
 
 function gameController() {
@@ -57,30 +75,34 @@ function gameController() {
     }
 
     const newGame = () => {
-        gameBoard.printBoard()
-        currentTurn = playersList[0]
+        gameScreen.printBoard()
+        gameScreen.addListener()
         printTurn()
+    }
+
+    const changeTurn = () => {
+        currentTurn == playersList[0] ? currentTurn = playersList[1] : currentTurn = currentTurn = playersList[0]
     }
 
     const playerTurn = (row, col) => {
         let guess = gameBoard.board[row - 1][col - 1]
         if (guess == "[ ]") {
             gameBoard.board[row - 1][col - 1] = `[${currentTurn.token}]`
-            gameBoard.printBoard()
+            gameScreen.printBoard()
             if (gameLogic(gameBoard.board) == "win") {
                 console.log(`${currentTurn.name} won the game!`)
             }
             else {
-                currentTurn == playersList[0] ? currentTurn = playersList[1] : currentTurn = currentTurn = playersList[0]
                 printTurn()
             }
         }
         else {
             console.log("Square already used, try again")
         }
+        return currentTurn
     }
 
-    return { playerTurn, newGame }
+    return { playerTurn, newGame, changeTurn }
 }
 
 // TODO: game current keeps playing after win
@@ -109,47 +131,6 @@ function gameLogic(testB) {
 const game = gameController()
 const gameScreen = screenController()
 game.newGame()
-
-cells = document.querySelectorAll(".cell")
-cells.forEach(cell => {
-    cell.addEventListener("click", e => {
-        setGuess(cell)
-    })
-});
-
-const setGuess = (guess) => {
-    selRow = guess.getAttribute("row")
-    selCol = guess.getAttribute("col")
-    console.log(selRow, selCol)
-}
-
-// straight row 1
-// game.playerTurn(1, 1)
-// game.playerTurn(2, 3)
-// game.playerTurn(1, 3)
-// game.playerTurn(2, 2)
-// game.playerTurn(1, 2)
-
-// diagonal
-// game.playerTurn(1, 1)
-// game.playerTurn(2, 3)
-// game.playerTurn(2, 2)
-// game.playerTurn(1, 2)
-// game.playerTurn(3, 3)
-
-// other diagonal
-// game.playerTurn(1, 3)
-// game.playerTurn(2, 3)
-// game.playerTurn(2, 2)
-// game.playerTurn(1, 2)
-// game.playerTurn(3, 1)
-
-// other diagonal
-// game.playerTurn(1, 2)
-// game.playerTurn(2, 3)
-// game.playerTurn(2, 2)
-// game.playerTurn(1, 1)
-// game.playerTurn(3, 2)
 
 
 
