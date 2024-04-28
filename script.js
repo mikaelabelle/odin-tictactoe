@@ -1,21 +1,29 @@
 const boardDiv = document.querySelector(".board")
 const playerH2 = document.querySelector("#turn span")
+const newGameBtn = document.querySelector("button")
 let cells
 
 const gameBoard = (function () {
     const board = []
-    for (let i = 0; i < 3; i++) {
-        board[i] = []
-        for (let j = 0; j < 3; j++) {
-            board[i][j] = "[ ]"
+
+    const makeBoard = () => {
+        for (let i = 0; i < 3; i++) {
+            board[i] = []
+            for (let j = 0; j < 3; j++) {
+                board[i][j] = "[ ]"
+            }
         }
+
     }
-    return { board }
+    makeBoard()
+    return { board, makeBoard }
 })()
 
 function screenController() {
     let selRow
     let selCol
+
+    newGameBtn.addEventListener("click", game.newGame)
 
     const printBoard = () => {
         for (let i = 0; i < 3; i++) {
@@ -25,6 +33,7 @@ function screenController() {
                 cell.setAttribute("row", i + 1)
                 cell.setAttribute("col", j + 1)
                 cell.setAttribute("player", "none")
+                cell.setAttribute("game", "on")
                 cell.classList.add("cell")
                 boardDiv.appendChild(cell)
             }
@@ -48,6 +57,13 @@ function screenController() {
         })
     }
 
+    const gameOver = () => {
+        removeListener()
+        cells.forEach(cell => {
+            cell.setAttribute("game", "over")
+        })
+    }
+
     const playerGuess = (cell) => {
         let guess = setGuess(cell)
         let turn = game.playerTurn(guess.selRow, guess.selCol)
@@ -68,7 +84,7 @@ function screenController() {
         return { selRow, selCol }
     }
 
-    return { printBoard, addListener, removeListener, setGuess }
+    return { printBoard, addListener, setGuess, gameOver }
 }
 
 function gameController() {
@@ -88,6 +104,8 @@ function gameController() {
     let winner = null
 
     const newGame = () => {
+        boardDiv.innerHTML = ""
+        gameBoard.makeBoard()
         gameScreen.printBoard()
         gameScreen.addListener()
     }
@@ -101,11 +119,15 @@ function gameController() {
         let guess = gameBoard.board[row - 1][col - 1]
         if (guess == "[ ]") {
             gameBoard.board[row - 1][col - 1] = `[${currentTurn.token}]`
-            gameScreen.printBoard()
+            // gameScreen.printBoard()
             if (gameLogic(gameBoard.board) == "win") {
                 console.log(`${currentTurn.name} won the game!`)
-                gameScreen.removeListener()
+                gameScreen.gameOver()
             }
+
+            // if (gameLogic(gameBoard.board == "tie")) {
+            //     console.log("tie")
+            // }
         }
         else {
             console.log("Square already used, try again")
@@ -128,6 +150,10 @@ function gameLogic(testB) {
         return "win"
     }
 
+    if (testB.map(i => i.filter(j => j === "[ ]")).length == 0) {
+        console.log("tie")
+    }
+
     for (let i = 0; i < 3; i++) {
         if (testB[0][i] == testB[1][i] && testB[1][i] == testB[2][i] && testB[0][i] != "[ ]")
             return "win"
@@ -137,6 +163,8 @@ function gameLogic(testB) {
         if (testB[i][0] == testB[i][1] && testB[i][1] == testB[i][2] && testB[i][0] != "[ ]")
             return "win"
     }
+
+
 }
 
 const game = gameController()

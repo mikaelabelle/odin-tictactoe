@@ -1,7 +1,7 @@
 body {
     font-family: 'Roboto', sans-serif;
     display: grid;
-    justify-content: center;
+    justify-items: center;
 }
 
 h1,
@@ -23,11 +23,13 @@ h2 {
     align-items: center;
     justify-content: center;
     font-size: 5rem;
+    transition: transform 0.2s ease;
 }
 
-.cell[player="none"]:hover {
+.cell[player="none"][game="on"]:hover {
     background-color: #D5F5E3;
     cursor: pointer;
+    transform: translateY(-3px) scale(1.05);
 }
 
 .cell[player="P1"] {
@@ -38,7 +40,19 @@ h2 {
     color: #E67E22
 }
 
-/* .cell[player="P1"]:hover,
-.cell[player="P2"]:hover {
-    background-color: #FADBD8;
-} */
+button {
+    width: 120px;
+    margin-top: 20px;
+    border: none;
+    padding: 10px;
+    border-radius: 10px;
+    background-color: #73C6B6;
+    color: #FFF;
+    font-weight: 500;
+    font-size: 12pt;
+
+}
+
+button:hover {
+    cursor: pointer;
+}
