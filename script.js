@@ -108,6 +108,7 @@ function gameController() {
         gameBoard.makeBoard()
         gameScreen.printBoard()
         gameScreen.addListener()
+        currentTurn = playersList[0]
     }
 
     const changeTurn = () => {
@@ -119,15 +120,15 @@ function gameController() {
         let guess = gameBoard.board[row - 1][col - 1]
         if (guess == "[ ]") {
             gameBoard.board[row - 1][col - 1] = `[${currentTurn.token}]`
-            // gameScreen.printBoard()
-            if (gameLogic(gameBoard.board) == "win") {
+            let gameStatus = gameLogic(gameBoard.board)
+            if (gameStatus == "win") {
                 console.log(`${currentTurn.name} won the game!`)
                 gameScreen.gameOver()
             }
-
-            // if (gameLogic(gameBoard.board == "tie")) {
-            //     console.log("tie")
-            // }
+            else if (gameStatus == "tie") {
+                console.log("tie")
+                gameScreen.gameOver()
+            }
         }
         else {
             console.log("Square already used, try again")
@@ -137,8 +138,6 @@ function gameController() {
 
     return { playerTurn, newGame, changeTurn }
 }
-
-// TODO: game current keeps playing after win
 
 function gameLogic(testB) {
 
@@ -150,8 +149,8 @@ function gameLogic(testB) {
         return "win"
     }
 
-    if (testB.map(i => i.filter(j => j === "[ ]")).length == 0) {
-        console.log("tie")
+    if (testB[0].includes("[ ]") === false && testB[1].includes("[ ]") === false && testB[2].includes("[ ]") === false) {
+        return "tie"
     }
 
     for (let i = 0; i < 3; i++) {
@@ -164,7 +163,7 @@ function gameLogic(testB) {
             return "win"
     }
 
-
+    return "not over"
 }
 
 const game = gameController()
