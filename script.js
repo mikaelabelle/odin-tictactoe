@@ -1,5 +1,5 @@
 const boardDiv = document.querySelector(".board")
-const playerH2 = document.querySelector("#turn span")
+const playerH2 = document.querySelector("#turn")
 const newGameBtn = document.querySelector("button")
 let cells
 
@@ -57,8 +57,14 @@ function screenController() {
         })
     }
 
-    const gameOver = () => {
+    const gameOver = (gameWinner) => {
         removeListener()
+        if (gameWinner === "tie") {
+            playerH2.innerText = `Game was a tie!`
+        }
+        else {
+            playerH2.innerText = `${gameWinner} won the game!`
+        }
         cells.forEach(cell => {
             cell.setAttribute("game", "over")
         })
@@ -67,15 +73,18 @@ function screenController() {
     const playerGuess = (cell) => {
         let guess = setGuess(cell)
         let turn = game.playerTurn(guess.selRow, guess.selCol)
-        cell.innerText = turn.token
-        if (turn.token === "X") {
+        cell.innerText = turn.currentTurn.token
+        if (turn.currentTurn.token === "X") {
             cell.setAttribute("player", "P1")
         }
         else {
             cell.setAttribute("player", "P2")
         }
         cell.removeEventListener("click", cellClick)
-        game.changeTurn()
+
+        if (turn.gameStatus === "not over") {
+            game.changeTurn()
+        }
     }
 
     const setGuess = (guess) => {
@@ -109,31 +118,31 @@ function gameController() {
         gameScreen.printBoard()
         gameScreen.addListener()
         currentTurn = playersList[0]
+        playerH2.innerText = `Current turn: ${currentTurn.name}`
     }
 
     const changeTurn = () => {
         currentTurn == playersList[0] ? currentTurn = playersList[1] : currentTurn = currentTurn = playersList[0]
-        playerH2.innerText = currentTurn.name
+        playerH2.innerText = `Current turn: ${currentTurn.name}`
     }
 
     const playerTurn = (row, col) => {
         let guess = gameBoard.board[row - 1][col - 1]
+        let gameStatus
         if (guess == "[ ]") {
             gameBoard.board[row - 1][col - 1] = `[${currentTurn.token}]`
-            let gameStatus = gameLogic(gameBoard.board)
+            gameStatus = gameLogic(gameBoard.board)
             if (gameStatus == "win") {
-                console.log(`${currentTurn.name} won the game!`)
-                gameScreen.gameOver()
+                gameScreen.gameOver(currentTurn.name)
             }
             else if (gameStatus == "tie") {
-                console.log("tie")
-                gameScreen.gameOver()
+                gameScreen.gameOver(gameStatus)
             }
         }
         else {
             console.log("Square already used, try again")
         }
-        return currentTurn
+        return { currentTurn, gameStatus }
     }
 
     return { playerTurn, newGame, changeTurn }
@@ -149,10 +158,6 @@ function gameLogic(testB) {
         return "win"
     }
 
-    if (testB[0].includes("[ ]") === false && testB[1].includes("[ ]") === false && testB[2].includes("[ ]") === false) {
-        return "tie"
-    }
-
     for (let i = 0; i < 3; i++) {
         if (testB[0][i] == testB[1][i] && testB[1][i] == testB[2][i] && testB[0][i] != "[ ]")
             return "win"
@@ -161,6 +166,10 @@ function gameLogic(testB) {
     for (let i = 0; i < 3; i++) {
         if (testB[i][0] == testB[i][1] && testB[i][1] == testB[i][2] && testB[i][0] != "[ ]")
             return "win"
+    }
+
+    if (testB[0].includes("[ ]") === false && testB[1].includes("[ ]") === false && testB[2].includes("[ ]") === false) {
+        return "tie"
     }
 
     return "not over"
